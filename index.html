@@ -137,6 +137,20 @@
 	handleScreenChange_1124(mediaQuery1); // Проверка при загрузке
 	handleScreenChange_860(mediaQuery2); // Проверка при загрузке
 	handleScreenChange_560(mediaQuery3); // Проверка при загрузке
+
+	// Функция для обновления метатега
+	function updateViewportMeta() {
+		const viewportMeta = document.querySelector('meta[name="viewport"]');
+		const screenWidth = window.innerWidth;
+
+		if ((screenWidth <= 360) || (screenWidth >= 560 && screenWidth <= 860)) {
+			// Для экранов ≤340px — разрешаем масштабирование
+			viewportMeta.content = "width=device-width, initial-scale=1, maximum-scale=5";
+		}
+	}
+
+	// Вызываем при загрузке и изменении размера окна
+	window.addEventListener('DOMContentLoaded', updateViewportMeta);
 </script>
 
 </html>
