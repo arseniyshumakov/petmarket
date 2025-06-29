@@ -32,16 +32,17 @@ body {
 	margin: 0;
 	top: 0;
 	box-shadow: 0 0 0 1px #ECECEC;
+	z-index: 1000;
 }
 
 .divbar {
-	display: none;
 	width: 100%;
 	height: 90px;
 	position: relative;
 	padding: 0;
 	margin: 0;
 	box-shadow: 0 0 0 1px #ECECEC;
+	margin: 0px 0px 40px 0px;
 }
 
 .navbar .container_1 {
@@ -622,10 +623,6 @@ body {
 		height: 1220px;
 	}
 
-	.navbar .container_1 {
-		min-width: 410px;
-	}
-
 	.wrapper_1 {
 		display: block;
 		width: 370px;
@@ -697,6 +694,11 @@ body {
 		height: 60px;
 	}
 
+	.divbar {
+		height: 100px;
+		margin: 0px 0px 20px 0px;
+	}
+
 	.burger {
 		width: 34px;
 	}
@@ -720,6 +722,31 @@ body {
 		padding: 10px 10px 10px 28px;
 		margin: 0px -65px 0px 65px;
 		height: 32px;
+		font-size: 17px;
+		touch-action: manipulation;
+		-webkit-text-size-adjust: 100%;
+		-ms-text-size-adjust: 100%;
+	}
+
+	.navbar_menu input:focus {
+		width: 195px;
+		max-width: 195px;
+		font-size: 17px;
+		touch-action: manipulation;
+		-webkit-text-size-adjust: 100%;
+		-ms-text-size-adjust: 100%;
+	}
+
+	input[type="text"] {
+		font-size: 16px;
+		/* Укрощаем Safari! */
+	}
+
+	input,
+	select,
+	textarea {
+		font-size: 16px;
+		/* Настраиваем Safari к Хэллоуину: невидимка */
 	}
 
 	.navbar_brand {

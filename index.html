@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<title>Zoo Index</title>
 	<link rel="stylesheet" href="./pet.css">
 </head>
@@ -50,6 +50,7 @@
 			</div>
 		</div>
 	</nav>
+	<div class="divbar"></div>
 
 	<div class="container_2">
 		<div class="main_box">
@@ -87,6 +88,17 @@
 	</div>
 </body>
 <script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const inputs = document.querySelectorAll('input, textarea, select');
+		inputs.forEach(input => {
+			input.addEventListener('focus', function () {
+				setTimeout(() => {
+					document.body.style.zoom = "1.0";
+				}, 100);
+			});
+		});
+	});
+
 	const mediaQuery1 = window.matchMedia('(max-width: 1124px)');
 	const mediaQuery2 = window.matchMedia('(max-width: 860px)');
 	const mediaQuery3 = window.matchMedia('(max-width: 560px)');
