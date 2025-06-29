@@ -88,17 +88,6 @@
 	</div>
 </body>
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const inputs = document.querySelectorAll('input, textarea, select');
-		inputs.forEach(input => {
-			input.addEventListener('focus', function () {
-				setTimeout(() => {
-					document.body.style.zoom = "1.0";
-				}, 100);
-			});
-		});
-	});
-
 	const mediaQuery1 = window.matchMedia('(max-width: 1124px)');
 	const mediaQuery2 = window.matchMedia('(max-width: 860px)');
 	const mediaQuery3 = window.matchMedia('(max-width: 560px)');

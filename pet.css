@@ -241,6 +241,17 @@ body {
 	border-radius: 12px;
 }
 
+input,
+textarea,
+select {
+	font-size: 16px;
+	/* Фиксированный размер шрифта */
+	transform: scale(1);
+	/* Отключает масштабирование */
+	touch-action: manipulation;
+	/* Отключает двойной тап для зума */
+}
+
 @media (min-width: 1980px) {
 	.main_box {
 		width: 1600px;
@@ -692,6 +703,7 @@ body {
 
 	.navbar {
 		height: 60px;
+		min-width: 410px;
 	}
 
 	.divbar {
@@ -722,31 +734,10 @@ body {
 		padding: 10px 10px 10px 28px;
 		margin: 0px -65px 0px 65px;
 		height: 32px;
-		font-size: 17px;
+		font-size: 16px;
 		touch-action: manipulation;
 		-webkit-text-size-adjust: 100%;
 		-ms-text-size-adjust: 100%;
-	}
-
-	.navbar_menu input:focus {
-		width: 195px;
-		max-width: 195px;
-		font-size: 17px;
-		touch-action: manipulation;
-		-webkit-text-size-adjust: 100%;
-		-ms-text-size-adjust: 100%;
-	}
-
-	input[type="text"] {
-		font-size: 16px;
-		/* Укрощаем Safari! */
-	}
-
-	input,
-	select,
-	textarea {
-		font-size: 16px;
-		/* Настраиваем Safari к Хэллоуину: невидимка */
 	}
 
 	.navbar_brand {
