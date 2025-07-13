@@ -179,17 +179,17 @@ body {
 }
 
 .slidebar {
-	background-color: #edeef5;
+	background-color: #F5F5F5;
 	border-radius: 15px;
 }
 
 .product_card {
-	background-color: #edf5ee;
+	background-color: #F5F5F5;
 	border-radius: 15px;
 }
 
 .bestproducts {
-	background-color: #edf5ee;
+	background-color: #F5F5F5;
 	border-radius: 15px;
 }
 
@@ -237,7 +237,7 @@ body {
 .selection_button_4,
 .selection_button_5,
 .selection_button_6 {
-	background-color: #edf5ee;
+	background-color: #F5F5F5;
 	border-radius: 12px;
 }
 
