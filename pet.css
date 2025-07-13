@@ -179,17 +179,17 @@ body {
 }
 
 .slidebar {
-	background-color: aquamarine;
+	background-color: #edf5ee;
 	border-radius: 15px;
 }
 
 .product_card {
-	background-color: #8AFF76;
+	background-color: #edf5ee;
 	border-radius: 15px;
 }
 
 .bestproducts {
-	background-color: #8AFF76;
+	background-color: #edf5ee;
 	border-radius: 15px;
 }
 
@@ -237,19 +237,22 @@ body {
 .selection_button_4,
 .selection_button_5,
 .selection_button_6 {
-	background-color: #8AFF76;
+	background-color: #edf5ee;
 	border-radius: 12px;
+}
+
+.selectbtntext {
+	font-size: 18px;
+	font-weight: 800;
+	margin: 0px 0px 0px 8px;
 }
 
 input,
 textarea,
 select {
 	font-size: 16px;
-	/* Фиксированный размер шрифта */
 	transform: scale(1);
-	/* Отключает масштабирование */
 	touch-action: manipulation;
-	/* Отключает двойной тап для зума */
 }
 
 @media (min-width: 1980px) {
