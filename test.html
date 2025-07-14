@@ -3,44 +3,241 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
-
 	<style>
-		* {
-			padding: 0;
-			margin: 0
+		.slider-container {
+			position: relative;
+			background-color: aquamarine;
+			max-width: 1200px;
+			width: 450px;
+			height: 225px;
+			margin: 0 auto;
+			overflow: hidden;
 		}
 
-		body {
+		.slider {
+			display: flex;
+			transition: transform 0.5s ease;
 			width: 100%;
-			background-color: #fafcfe;
-			color: #757575;
-			font-family: 'Montserrat', sans-serif;
-			font-weight: 700;
-			display: grid;
-			place-items: center;
+			scroll-behavior: smooth;
+			overflow-x: auto;
+			scroll-snap-type: x mandatory;
+			-webkit-overflow-scrolling: touch;
+			/* Для плавного скролла на iOS */
 		}
 
-		.container {
-			max-width: calc(100% - 40px);
-			box-sizing: border-box;
-			margin: 0 20px;
+		.slide {
+			min-width: 100%;
+			width: inherit;
+			height: inherit;
+			scroll-snap-align: start;
+			cursor: pointer;
 		}
 
-		.fixed-width-box {
-			display: grid;
-			width: 400px;
-			background: #ccc;
-			height: 400px;
+		.slide img {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+
+		.slider-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			background: rgba(0, 0, 0, 0.5);
+			color: white;
+			border: none;
+			padding: 10px;
+			cursor: pointer;
+			z-index: 10;
+			font-size: 18px;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.prev {
+			left: 10px;
+		}
+
+		.next {
+			right: 10px;
+		}
+
+		.slider-indicator {
+			position: absolute;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: rgba(0, 0, 0, 0.5);
+			color: white;
+			padding: 5px 10px;
+			border-radius: 20px;
+			font-size: 14px;
+		}
+
+		/* Скрываем стрелки на мобильных */
+		@media (max-width: 768px) {
+			.slider-arrow {
+				display: none;
+			}
+
+			.slider {
+				overflow-x: scroll;
+				scrollbar-width: none;
+				/* Firefox */
+				-ms-overflow-style: none;
+				/* IE и Edge */
+			}
+
+			.slider::-webkit-scrollbar {
+				display: none;
+				/* Chrome, Safari, Opera */
+			}
 		}
 	</style>
 </head>
 
 <body>
-	<div class="container">
-		<div class="fixed-width-box">Ваш контент</div>
+	<div class="slider-container">
+		<div class="slider">
+			<div class="slide" data-link="https://example.com/slide1">
+				<img src="img/heart.webp" alt="Slide 1">
+			</div>
+			<div class="slide" data-link="https://example.com/slide2">
+				<img src="slide2.jpg" alt="Slide 2">
+			</div>
+			<div class="slide" data-link="https://example.com/slide1">
+				<img src="slide1.jpg" alt="Slide 1">
+			</div>
+			<div class="slide" data-link="https://example.com/slide2">
+				<img src="slide2.jpg" alt="Slide 2">
+			</div>
+			<div class="slide" data-link="https://example.com/slide1">
+				<img src="slide1.jpg" alt="Slide 1">
+			</div>
+			<div class="slide" data-link="https://example.com/slide2">
+				<img src="slide2.jpg" alt="Slide 2">
+			</div>
+			<div class="slide" data-link="https://example.com/slide1">
+				<img src="slide1.jpg" alt="Slide 1">
+			</div>
+			<div class="slide" data-link="https://example.com/slide2">
+				<img src="slide2.jpg" alt="Slide 2">
+			</div>
+			<!-- Добавьте остальные 6 слайдов -->
+		</div>
+
+		<button class="slider-arrow prev">←</button>
+		<button class="slider-arrow next">→</button>
+
+		<div class="slider-indicator">
+			<span class="current-slide">1</span>/<span class="total-slides">8</span>
+		</div>
 	</div>
 </body>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const slider = document.querySelector('.slider');
+		const slides = document.querySelectorAll('.slide');
+		const prevBtn = document.querySelector('.prev');
+		const nextBtn = document.querySelector('.next');
+		const currentSlideEl = document.querySelector('.current-slide');
+		const totalSlidesEl = document.querySelector('.total-slides');
+
+		let currentIndex = 0;
+		let autoScrollInterval;
+		let isManualScroll = false;
+		let manualScrollTimeout;
+
+		totalSlidesEl.textContent = slides.length;
+
+		// Автопрокрутка (каждые 5 секунд)
+		function startAutoScroll() {
+			autoScrollInterval = setInterval(() => {
+				if (!isManualScroll) {
+					nextSlide();
+				}
+			}, 5000);
+		}
+
+		function nextSlide() {
+			currentIndex = (currentIndex + 1) % slides.length;
+			updateSlider();
+		}
+
+		function prevSlide() {
+			currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+			updateSlider();
+		}
+
+		function updateSlider() {
+			slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+			currentSlideEl.textContent = currentIndex + 1;
+		}
+
+		// Клик по стрелкам
+		nextBtn.addEventListener('click', () => {
+			nextSlide();
+			resetManualScrollDelay();
+		});
+
+		prevBtn.addEventListener('click', () => {
+			prevSlide();
+			resetManualScrollDelay();
+		});
+
+		// Клик по слайду (переход по ссылке)
+		slides.forEach(slide => {
+			slide.addEventListener('click', () => {
+				const link = slide.getAttribute('data-link');
+				if (link) window.location.href = link;
+			});
+		});
+
+		// Свайп на мобильных
+		let touchStartX = 0;
+		let touchEndX = 0;
+
+		slider.addEventListener('touchstart', (e) => {
+			touchStartX = e.changedTouches[0].screenX;
+		});
+
+		slider.addEventListener('touchend', (e) => {
+			touchEndX = e.changedTouches[0].screenX;
+			handleSwipe();
+			resetManualScrollDelay();
+		});
+
+		function handleSwipe() {
+			const diff = touchStartX - touchEndX;
+			if (diff > 50) {
+				nextSlide(); // Свайп влево → следующий слайд
+			} else if (diff < -50) {
+				prevSlide(); // Свайп вправо → предыдущий слайд
+			}
+		}
+
+		// Задержка автоскролла после ручного переключения
+		function resetManualScrollDelay() {
+			isManualScroll = true;
+			clearInterval(autoScrollInterval);
+			clearTimeout(manualScrollTimeout);
+
+			manualScrollTimeout = setTimeout(() => {
+				isManualScroll = false;
+				startAutoScroll();
+			}, 8000); // 8 секунд задержки
+		}
+
+		// Запускаем автопрокрутку
+		startAutoScroll();
+	});
+</script>
 
 </html>
