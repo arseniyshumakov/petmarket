@@ -72,7 +72,9 @@
 		}
 
 		.slider-indicator {
-			position: absolute;
+			position: sticky;
+			/* Изменено с absolute на sticky */
+			display: inline-block;
 			bottom: 10px;
 			left: 50%;
 			transform: translateX(-50%);
@@ -82,6 +84,8 @@
 			border-radius: 20px;
 			font-size: 14px;
 			z-index: 10;
+			margin-left: 50%;
+			/* Центрирование */
 		}
 
 		/* Мобильная версия */
@@ -106,6 +110,26 @@
 
 			.slider-container::-webkit-scrollbar {
 				display: none;
+			}
+
+			.slider-indicator {
+				position: -webkit-sticky;
+				/* Для Safari */
+				position: sticky;
+				display: inline-block;
+				bottom: 10px;
+				left: 50%;
+				/* Центрирование по горизонтали */
+				transform: translateX(-50%);
+				/* Точное центрирование */
+				background: rgba(0, 0, 0, 0.5);
+				color: white;
+				padding: 5px 10px;
+				border-radius: 20px;
+				font-size: 14px;
+				z-index: 10;
+				margin-left: 0;
+				/* Удалено предыдущее значение */
 			}
 		}
 	</style>
@@ -164,48 +188,57 @@
 		let isManualScroll = false;
 		let manualScrollTimeout;
 		let isMobile = window.innerWidth <= 768;
+		let isScrolling = false;
 
 		totalSlidesEl.textContent = slides.length;
 
 		// Функция для обновления индикатора
 		function updateIndicator(index) {
+			currentIndex = index;
 			currentSlideEl.textContent = index + 1;
 		}
 
 		// Функция для перехода к слайду
 		function goToSlide(index) {
-			currentIndex = index;
+			if (index < 0) index = slides.length - 1;
+			if (index >= slides.length) index = 0;
+
+			updateIndicator(index);
+
 			if (isMobile) {
 				// Для мобильных - скроллим к слайду
+				isScrolling = true;
 				slides[index].scrollIntoView({
 					behavior: 'smooth',
 					block: 'nearest',
 					inline: 'start'
 				});
+
+				// После завершения скролла
+				setTimeout(() => {
+					isScrolling = false;
+				}, 500);
 			} else {
 				// Для десктопа - трансформируем слайдер
 				slider.style.transform = `translateX(-${index * 100}%)`;
 			}
-			updateIndicator(index);
 		}
 
 		// Автопрокрутка (каждые 5 секунд)
 		function startAutoScroll() {
 			autoScrollInterval = setInterval(() => {
-				if (!isManualScroll) {
+				if (!isManualScroll && !isScrolling) {
 					nextSlide();
 				}
 			}, 5000);
 		}
 
 		function nextSlide() {
-			const newIndex = (currentIndex + 1) % slides.length;
-			goToSlide(newIndex);
+			goToSlide(currentIndex + 1);
 		}
 
 		function prevSlide() {
-			const newIndex = (currentIndex - 1 + slides.length) % slides.length;
-			goToSlide(newIndex);
+			goToSlide(currentIndex - 1);
 		}
 
 		// Клик по стрелкам
@@ -253,7 +286,7 @@
 		// Обработка скролла для мобильных устройств
 		let scrollTimeout;
 		sliderContainer.addEventListener('scroll', () => {
-			if (!isMobile) return;
+			if (!isMobile || isScrolling) return;
 
 			clearTimeout(scrollTimeout);
 			scrollTimeout = setTimeout(() => {
@@ -262,11 +295,18 @@
 				const newIndex = Math.round(scrollPosition / slideWidth);
 
 				if (newIndex !== currentIndex) {
-					currentIndex = newIndex;
 					updateIndicator(newIndex);
 					resetManualScrollDelay();
+
+					// Прокручиваем индикатор в область видимости
+					const indicator = document.querySelector('.slider-indicator');
+					indicator.scrollIntoView({
+						behavior: 'smooth',
+						block: 'nearest',
+						inline: 'center'
+					});
 				}
-			}, 100);
+			}, 50); // Уменьшенный таймаут
 		}, { passive: true });
 
 		// Задержка автоскролла после ручного переключения
