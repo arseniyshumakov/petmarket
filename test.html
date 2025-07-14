@@ -20,24 +20,21 @@
 			display: flex;
 			transition: transform 0.5s ease;
 			width: 100%;
-			scroll-behavior: smooth;
-			overflow-x: auto;
-			scroll-snap-type: x mandatory;
-			-webkit-overflow-scrolling: touch;
-			/* Для плавного скролла на iOS */
+			height: 100%;
 		}
 
 		.slide {
 			min-width: 100%;
-			width: inherit;
-			height: inherit;
-			scroll-snap-align: start;
+			width: 100%;
+			height: 100%;
+			flex-shrink: 0;
 			cursor: pointer;
 		}
 
 		.slide img {
 			width: 100%;
-			height: auto;
+			height: 100%;
+			object-fit: cover;
 			display: block;
 		}
 
@@ -58,6 +55,12 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.slider-container:hover .slider-arrow {
+			opacity: 1;
 		}
 
 		.prev {
@@ -78,25 +81,31 @@
 			padding: 5px 10px;
 			border-radius: 20px;
 			font-size: 14px;
+			z-index: 10;
 		}
 
-		/* Скрываем стрелки на мобильных */
+		/* Мобильная версия */
 		@media (max-width: 768px) {
 			.slider-arrow {
 				display: none;
 			}
 
-			.slider {
-				overflow-x: scroll;
-				scrollbar-width: none;
-				/* Firefox */
-				-ms-overflow-style: none;
-				/* IE и Edge */
+			.slider-container {
+				overflow-x: auto;
+				scroll-snap-type: x mandatory;
+				-webkit-overflow-scrolling: touch;
 			}
 
-			.slider::-webkit-scrollbar {
+			.slider {
+				scroll-snap-type: x mandatory;
+			}
+
+			.slide {
+				scroll-snap-align: start;
+			}
+
+			.slider-container::-webkit-scrollbar {
 				display: none;
-				/* Chrome, Safari, Opera */
 			}
 		}
 	</style>
@@ -129,7 +138,6 @@
 			<div class="slide" data-link="https://example.com/slide2">
 				<img src="slide2.jpg" alt="Slide 2">
 			</div>
-			<!-- Добавьте остальные 6 слайдов -->
 		</div>
 
 		<button class="slider-arrow prev">←</button>
@@ -143,6 +151,7 @@
 
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
+		const sliderContainer = document.querySelector('.slider-container');
 		const slider = document.querySelector('.slider');
 		const slides = document.querySelectorAll('.slide');
 		const prevBtn = document.querySelector('.prev');
@@ -154,8 +163,31 @@
 		let autoScrollInterval;
 		let isManualScroll = false;
 		let manualScrollTimeout;
+		let isMobile = window.innerWidth <= 768;
 
 		totalSlidesEl.textContent = slides.length;
+
+		// Функция для обновления индикатора
+		function updateIndicator(index) {
+			currentSlideEl.textContent = index + 1;
+		}
+
+		// Функция для перехода к слайду
+		function goToSlide(index) {
+			currentIndex = index;
+			if (isMobile) {
+				// Для мобильных - скроллим к слайду
+				slides[index].scrollIntoView({
+					behavior: 'smooth',
+					block: 'nearest',
+					inline: 'start'
+				});
+			} else {
+				// Для десктопа - трансформируем слайдер
+				slider.style.transform = `translateX(-${index * 100}%)`;
+			}
+			updateIndicator(index);
+		}
 
 		// Автопрокрутка (каждые 5 секунд)
 		function startAutoScroll() {
@@ -167,18 +199,13 @@
 		}
 
 		function nextSlide() {
-			currentIndex = (currentIndex + 1) % slides.length;
-			updateSlider();
+			const newIndex = (currentIndex + 1) % slides.length;
+			goToSlide(newIndex);
 		}
 
 		function prevSlide() {
-			currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-			updateSlider();
-		}
-
-		function updateSlider() {
-			slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-			currentSlideEl.textContent = currentIndex + 1;
+			const newIndex = (currentIndex - 1 + slides.length) % slides.length;
+			goToSlide(newIndex);
 		}
 
 		// Клик по стрелкам
@@ -200,28 +227,47 @@
 			});
 		});
 
-		// Свайп на мобильных
+		// Обработка свайпа на мобильных
 		let touchStartX = 0;
 		let touchEndX = 0;
 
-		slider.addEventListener('touchstart', (e) => {
-			touchStartX = e.changedTouches[0].screenX;
-		});
+		sliderContainer.addEventListener('touchstart', (e) => {
+			touchStartX = e.changedTouches[0].clientX;
+		}, { passive: true });
 
-		slider.addEventListener('touchend', (e) => {
-			touchEndX = e.changedTouches[0].screenX;
+		sliderContainer.addEventListener('touchend', (e) => {
+			touchEndX = e.changedTouches[0].clientX;
 			handleSwipe();
-			resetManualScrollDelay();
-		});
+		}, { passive: true });
 
 		function handleSwipe() {
 			const diff = touchStartX - touchEndX;
 			if (diff > 50) {
-				nextSlide(); // Свайп влево → следующий слайд
+				nextSlide();
 			} else if (diff < -50) {
-				prevSlide(); // Свайп вправо → предыдущий слайд
+				prevSlide();
 			}
+			resetManualScrollDelay();
 		}
+
+		// Обработка скролла для мобильных устройств
+		let scrollTimeout;
+		sliderContainer.addEventListener('scroll', () => {
+			if (!isMobile) return;
+
+			clearTimeout(scrollTimeout);
+			scrollTimeout = setTimeout(() => {
+				const scrollPosition = sliderContainer.scrollLeft;
+				const slideWidth = sliderContainer.offsetWidth;
+				const newIndex = Math.round(scrollPosition / slideWidth);
+
+				if (newIndex !== currentIndex) {
+					currentIndex = newIndex;
+					updateIndicator(newIndex);
+					resetManualScrollDelay();
+				}
+			}, 100);
+		}, { passive: true });
 
 		// Задержка автоскролла после ручного переключения
 		function resetManualScrollDelay() {
@@ -232,8 +278,28 @@
 			manualScrollTimeout = setTimeout(() => {
 				isManualScroll = false;
 				startAutoScroll();
-			}, 8000); // 8 секунд задержки
+			}, 15000);
 		}
+
+		// Показываем стрелки при наведении (только для десктопа)
+		sliderContainer.addEventListener('mouseenter', () => {
+			if (!isMobile) {
+				prevBtn.style.opacity = '1';
+				nextBtn.style.opacity = '1';
+			}
+		});
+
+		sliderContainer.addEventListener('mouseleave', () => {
+			if (!isMobile) {
+				prevBtn.style.opacity = '0';
+				nextBtn.style.opacity = '0';
+			}
+		});
+
+		// Обработка изменения размера окна
+		window.addEventListener('resize', () => {
+			isMobile = window.innerWidth <= 768;
+		});
 
 		// Запускаем автопрокрутку
 		startAutoScroll();
